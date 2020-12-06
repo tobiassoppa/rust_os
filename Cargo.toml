@@ -1,0 +1,28 @@
+[package]
+name = "kernel"
+version = "0.1.0"
+authors = ["tobiassoppa <tobias@soppa.me>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[profile.release]
+lto = true
+
+# The features section is used to select the target board.
+[features]
+default = []
+bsp_rpi3 = ["register"]
+bsp_rpi4 = ["register"]
+
+[dependencies]
+
+# Optional dependencies
+register = { version = "1.x.x", optional = true }
+
+# Note: Before the cortex-a was not platform specific,
+#       there were lot's of crate related errors in the code.
+
+# Platform specific dependencies
+[target.'cfg(target_arch = "aarch64")'.dependencies]
+cortex-a = { version = "5.x.x" }

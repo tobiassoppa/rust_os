@@ -1,0 +1,57 @@
+current directory: /Users/Tobias/GitHub/rust_os/.vendor/bundle/ruby/2.7.0/gems/serialport-1.3.1/ext/native
+/Users/Tobias/.rbenv/versions/2.7.2/bin/ruby -I /Users/Tobias/.rbenv/versions/2.7.2/lib/ruby/2.7.0 -r ./siteconf20201111-89679-12kopwp.rb extconf.rb
+checking for OS... darwin
+checking for termios.h... yes
+checking for unistd.h... yes
+creating Makefile
+
+current directory: /Users/Tobias/GitHub/rust_os/.vendor/bundle/ruby/2.7.0/gems/serialport-1.3.1/ext/native
+make "DESTDIR=" clean
+
+current directory: /Users/Tobias/GitHub/rust_os/.vendor/bundle/ruby/2.7.0/gems/serialport-1.3.1/ext/native
+make "DESTDIR="
+compiling posix_serialport_impl.c
+posix_serialport_impl.c:97:7: warning: initializing 'char *' with an expression of type 'const char [11]' discards qualifiers [-Wincompatible-pointer-types-discards-qualifiers]
+      "/dev/cuaa0", "/dev/cuaa1", "/dev/cuaa2", "/dev/cuaa3",
+      ^~~~~~~~~~~~
+posix_serialport_impl.c:97:21: warning: initializing 'char *' with an expression of type 'const char [11]' discards qualifiers [-Wincompatible-pointer-types-discards-qualifiers]
+      "/dev/cuaa0", "/dev/cuaa1", "/dev/cuaa2", "/dev/cuaa3",
+                    ^~~~~~~~~~~~
+posix_serialport_impl.c:97:35: warning: initializing 'char *' with an expression of type 'const char [11]' discards qualifiers [-Wincompatible-pointer-types-discards-qualifiers]
+      "/dev/cuaa0", "/dev/cuaa1", "/dev/cuaa2", "/dev/cuaa3",
+                                  ^~~~~~~~~~~~
+posix_serialport_impl.c:97:49: warning: initializing 'char *' with an expression of type 'const char [11]' discards qualifiers [-Wincompatible-pointer-types-discards-qualifiers]
+      "/dev/cuaa0", "/dev/cuaa1", "/dev/cuaa2", "/dev/cuaa3",
+                                                ^~~~~~~~~~~~
+posix_serialport_impl.c:98:7: warning: initializing 'char *' with an expression of type 'const char [11]' discards qualifiers [-Wincompatible-pointer-types-discards-qualifiers]
+      "/dev/cuaa4", "/dev/cuaa5", "/dev/cuaa6", "/dev/cuaa7"
+      ^~~~~~~~~~~~
+posix_serialport_impl.c:98:21: warning: initializing 'char *' with an expression of type 'const char [11]' discards qualifiers [-Wincompatible-pointer-types-discards-qualifiers]
+      "/dev/cuaa4", "/dev/cuaa5", "/dev/cuaa6", "/dev/cuaa7"
+                    ^~~~~~~~~~~~
+posix_serialport_impl.c:98:35: warning: initializing 'char *' with an expression of type 'const char [11]' discards qualifiers [-Wincompatible-pointer-types-discards-qualifiers]
+      "/dev/cuaa4", "/dev/cuaa5", "/dev/cuaa6", "/dev/cuaa7"
+                                  ^~~~~~~~~~~~
+posix_serialport_impl.c:98:49: warning: initializing 'char *' with an expression of type 'const char [11]' discards qualifiers [-Wincompatible-pointer-types-discards-qualifiers]
+      "/dev/cuaa4", "/dev/cuaa5", "/dev/cuaa6", "/dev/cuaa7"
+                                                ^~~~~~~~~~~~
+posix_serialport_impl.c:114:13: warning: incompatible pointer to integer conversion passing 'struct RFile *' to parameter of type 'VALUE' (aka 'unsigned long') [-Wint-conversion]
+   OBJSETUP(sp, class, T_FILE);
+            ^~
+/Users/Tobias/.rbenv/versions/2.7.2/include/ruby-2.7.0/ruby/ruby.h:786:40: note: expanded from macro 'OBJSETUP'
+#define OBJSETUP(obj,c,t) rb_obj_setup(obj, c, t) /* use NEWOBJ_OF instead of NEWOBJ()+OBJSETUP() */
+                                       ^~~
+/Users/Tobias/.rbenv/versions/2.7.2/include/ruby-2.7.0/ruby/ruby.h:781:26: note: passing argument to parameter 'obj' here
+VALUE rb_obj_setup(VALUE obj, VALUE klass, VALUE type);
+                         ^
+posix_serialport_impl.c:121:39: warning: comparison of integers of different signs: 'int' and 'unsigned long' [-Wsign-compare]
+         if (num_port < 0 || num_port > sizeof(ports) / sizeof(ports[0]))
+                             ~~~~~~~~ ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+10 warnings generated.
+compiling serialport.c
+compiling win_serialport_impl.c
+linking shared-object serialport.bundle
+
+current directory: /Users/Tobias/GitHub/rust_os/.vendor/bundle/ruby/2.7.0/gems/serialport-1.3.1/ext/native
+make "DESTDIR=" install
+/usr/bin/install -c -m 0755 serialport.bundle ./.gem.20201111-89679-1yencu5

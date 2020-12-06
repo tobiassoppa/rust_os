@@ -1,0 +1,6 @@
+# https://os.phil-opp.com/minimal-rust-kernel/#memory-related-intrinsics
+[unstable]
+build-std-features = ["compiler-builtins-mem"]
+
+[build]
+target = "aarch64-unknown-none-softfloat"
