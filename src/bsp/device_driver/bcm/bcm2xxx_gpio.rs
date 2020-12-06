@@ -148,7 +148,7 @@ impl GPIOInner {
         //
         // So lets try to be on the safe side and default to 2000 cycles, which would equal 1 µs
         // would the CPU be clocked at 2 GHz.
-        const DELAY: usize = 2000;
+        const DELAY: usize = 20000;
 
         self.registers.GPPUD.write(GPPUD::PUD::Off);
         cpu::spin_for_cycles(DELAY);
@@ -184,6 +184,7 @@ impl GPIOInner {
         // Disable pull-up/down on pins 14 and 15.
         #[cfg(feature = "bsp_rpi3")]
         self.disable_pud_14_15_bcm2837();
+
         #[cfg(feature = "bsp_rpi4")]
         self.disable_pud_14_15_bcm2711();
     }

@@ -116,10 +116,10 @@ objdump: $(KERNEL_ELF)
 	@$(DOCKER_ELFTOOLS) $(OBJDUMP_BINARY) --disassemble --demangle \
                 --section .text \
                 --section .got  \
-                $(KERNEL_ELF) | rustfilt
+                $(KERNEL_ELF) 
 
 nm: $(KERNEL_ELF)
-	@$(DOCKER_ELFTOOLS) $(NM_BINARY) --demangle --print-size $(KERNEL_ELF) | sort | rustfilt
+	@$(DOCKER_ELFTOOLS) $(NM_BINARY) --demangle --print-size $(KERNEL_ELF) | sort 
 
 # For rust-analyzer
 check:

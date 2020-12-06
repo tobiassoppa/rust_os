@@ -48,7 +48,6 @@ unsafe fn kernel_init() -> ! {
             panic!("Error loading driver: {}: {}", i.compatible(), x);
         }
     }
-
     bsp::driver::driver_manager().post_device_driver_init();
     // println! is usable from here on.
 
