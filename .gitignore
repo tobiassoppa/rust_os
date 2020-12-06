@@ -1,1 +1,5 @@
 /target
+/.vendor
+demo_payload_rpi3.img
+demo_payload_rpi4.img
+kernel8.img
