@@ -13,7 +13,7 @@ use crate::{bsp, memory};
 /// - Must only be called pre `kernel_init()`.
 #[inline(always)]
 unsafe fn zero_bss() {
-    memory::zero_volatile(bsp::memory::relocated_bss_range_inclusive());
+    memory::zero_volatile(bsp::memory::bss_range_inclusive());
 }
 
 /// Equivalent to `crt0` or `c0` code in C/C++ world. Clears the `bss` section, then jumps to kernel
@@ -22,7 +22,6 @@ unsafe fn zero_bss() {
 /// # Safety
 ///
 /// - Only a single core must be active and running this function.
-#[no_mangle]
 pub unsafe fn runtime_init() -> ! {
     zero_bss();
 

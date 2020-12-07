@@ -6,8 +6,7 @@
 BSP ?= rpi3
 
 # Default to a serial device name that is common in Linux.
-#DEV_SERIAL ?= /dev/ttyUSB0
-DEV_SERIAL ?= /dev/tty.Repleo-PL2303-00002014
+DEV_SERIAL ?= /dev/tty.Repleo-PL2303-00001014 # left usb port
 
 # Query tbe host system's kernel name
 UNAME_S = $(shell uname -s)
@@ -22,8 +21,7 @@ ifeq ($(BSP),rpi3)
     OBJDUMP_BINARY    = aarch64-none-elf-objdump
     NM_BINARY         = aarch64-none-elf-nm
     LINKER_FILE       = src/bsp/raspberrypi/link.ld
-    RUSTC_MISC_ARGS   = -C target-cpu=cortex-a53 -C relocation-model=pic
-    CHAINBOOT_DEMO_PAYLOAD = demo_payload_rpi3.img
+    RUSTC_MISC_ARGS   = -C target-cpu=cortex-a53 
 else ifeq ($(BSP),rpi4)
     TARGET            = aarch64-unknown-none-softfloat
     KERNEL_BIN        = kernel8.img
@@ -33,8 +31,7 @@ else ifeq ($(BSP),rpi4)
     OBJDUMP_BINARY    = aarch64-none-elf-objdump
     NM_BINARY         = aarch64-none-elf-nm
     LINKER_FILE       = src/bsp/raspberrypi/link.ld
-    RUSTC_MISC_ARGS   = -C target-cpu=cortex-a72 -C relocation-model=pic
-    CHAINBOOT_DEMO_PAYLOAD = demo_payload_rpi4.img
+    RUSTC_MISC_ARGS   = -C target-cpu=cortex-a72 
 endif
 
 # Export for build.rs
@@ -75,8 +72,7 @@ endif
 EXEC_QEMU       = $(QEMU_BINARY) -M $(QEMU_MACHINE_TYPE)
 EXEC_MINIPUSH   = ruby utils/minipush.rb
 
-.PHONY: all $(KERNEL_ELF) $(KERNEL_BIN) doc qemu qemuasm chainboot clippy clean readelf objdump nm \
-    check
+.PHONY: all $(KERNEL_ELF) $(KERNEL_BIN) doc qemu chainboot clippy clean readelf objdump nm check
 
 all: $(KERNEL_BIN)
 
@@ -90,18 +86,16 @@ doc:
 	$(DOC_CMD) --document-private-items --open
 
 ifeq ($(QEMU_MACHINE_TYPE),)
-qemu qemuasm:
+qemu:
 	@echo "This board is not yet supported for QEMU."
 else
 qemu: $(KERNEL_BIN)
 	@$(DOCKER_QEMU) $(EXEC_QEMU) $(QEMU_RELEASE_ARGS) -kernel $(KERNEL_BIN)
-qemuasm: $(KERNEL_BIN)
-	@$(DOCKER_QEMU) $(EXEC_QEMU) $(QEMU_RELEASE_ARGS) -kernel $(KERNEL_BIN) -d in_asm
 endif
 
 
-chainboot:
-	@$(DOCKER_CHAINBOOT) $(EXEC_MINIPUSH) $(DEV_SERIAL) $(CHAINBOOT_DEMO_PAYLOAD)
+chainboot: $(KERNEL_BIN)
+	@$(DOCKER_CHAINBOOT) $(EXEC_MINIPUSH) $(DEV_SERIAL) $(KERNEL_BIN)
 
 clippy:
 	RUSTFLAGS="$(RUSTFLAGS_PEDANTIC)" $(CLIPPY_CMD)
@@ -113,10 +107,7 @@ readelf: $(KERNEL_ELF)
 	readelf --headers $(KERNEL_ELF)
 
 objdump: $(KERNEL_ELF)
-	@$(DOCKER_ELFTOOLS) $(OBJDUMP_BINARY) --disassemble --demangle \
-                --section .text \
-                --section .got  \
-                $(KERNEL_ELF) 
+	@$(DOCKER_ELFTOOLS) $(OBJDUMP_BINARY) --disassemble --demangle $(KERNEL_ELF) 
 
 nm: $(KERNEL_ELF)
 	@$(DOCKER_ELFTOOLS) $(NM_BINARY) --demangle --print-size $(KERNEL_ELF) | sort 

@@ -6,14 +6,11 @@
 SECTIONS
 {
     /* Set current address to 32 MiB */
-    . = 0x2000000;
+    . = 0x80000;
 
-    __binary_start = .;
     .text :
     {
-        *(.text._start)
-        KEEP(*(.text.runtime_init))
-        *(.text*);
+        *(.text._start) *(.text*)
     }
 
     .rodata :
@@ -37,17 +34,6 @@ SECTIONS
         . += 8;
         __bss_end_inclusive = . - 8;
     }
-
-    .got :
-    {
-        *(.got*)
-    }
-
-    /* Fill up to 8 byte, b/c relocating the binary is done in u64 chunks */
-    . = ALIGN(8);
-    __binary_end_inclusive = . - 8;
-
-    __runtime_init_reloc = runtime_init;
 
     /DISCARD/ : { *(.comment*) }
 }

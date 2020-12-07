@@ -21,12 +21,12 @@ use cortex_a::{asm, regs::*};
 #[naked]
 #[no_mangle]
 pub unsafe fn _start() -> ! {
-    use crate::relocate;
+    use crate::runtime_init;
 
     // Expect the boot core to start in EL2.
     if bsp::cpu::BOOT_CORE_ID == cpu::smp::core_id() {
         SP.set(bsp::memory::boot_core_stack_end() as u64);
-        relocate::relocate_self()
+        runtime_init::runtime_init()
     } else {
         // If not core0, infinitely wait for events.
         wait_forever()
@@ -39,35 +39,10 @@ pub unsafe fn _start() -> ! {
 
 pub use asm::nop;
 
-/// Spin for `n` cycles.
-#[cfg(feature = "bsp_rpi3")]
-#[inline(always)]
-pub fn spin_for_cycles(n: usize) {
-    for _ in 0..n {
-        asm::nop();
-    }
-}
-
 /// Pause execution on the core.
 #[inline(always)]
 pub fn wait_forever() -> ! {
     loop {
         asm::wfe()
     }
-}
-
-/// Branch to a raw integer value.
-///
-///  # Safety
-///
-/// - This is highly unsafe. Use with care.
-#[inline(always)]
-pub unsafe fn branch_to_raw_addr(addr: usize) -> ! {
-    asm!(
-        "blr {destination:x}",
-        destination = in(reg) addr,
-        options(nomem, nostack)
-    );
-
-    core::intrinsics::unreachable()
 }

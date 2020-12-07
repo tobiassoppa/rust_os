@@ -294,11 +294,18 @@ impl console::interface::Read for PL011Uart {
                 cpu::nop();
             }
 
+            // Read one character.
+            let mut ret = inner.registers.DR.get() as u8 as char;
+
+            // Convert carriage return to newline.
+            if ret == '\r' {
+                ret = '\n'
+            }
+
             // Update statistics.
             inner.chars_read += 1;
 
-            // Read one character.
-            inner.registers.DR.get() as u8 as char
+            ret
         })
     }
 
