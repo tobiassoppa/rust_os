@@ -25,6 +25,7 @@ mod bsp;
 mod console;
 mod cpu;
 mod driver;
+mod exception;
 mod memory;
 mod panic_wait;
 mod print;
@@ -55,11 +56,18 @@ unsafe fn kernel_init() -> ! {
 
 /// The main function running after the early init.
 fn kernel_main() -> ! {
+    use console::interface::All;
     use core::time::Duration;
     use driver::interface::DriverManager;
     use time::interface::TimeManager;
 
     info!("Booting on: {}", bsp::board_name());
+
+    let (_, privilege_level) = exception::current_privilege_level();
+    info!("Current privilgege level: {}", privilege_level);
+
+    info!("Exception handling state:");
+    exception::asynchronous::print_state();
 
     info!(
         "Architectural timer resolution: {} ns",
@@ -76,10 +84,12 @@ fn kernel_main() -> ! {
     }
 
     // Test a failing timer case.
-    time::time_manager().spin_for(Duration::from_nanos(1));
+    info!("Timer test, spinning for 1 second");
+    time::time_manager().spin_for(Duration::from_secs(1));
 
+    info!("Echoing input now");
     loop {
-        info!("Spinning for 1 second");
-        time::time_manager().spin_for(Duration::from_secs(1));
+        let c = bsp::console::console().read_char();
+        bsp::console::console().write_char(c);
     }
 }
