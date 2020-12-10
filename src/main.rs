@@ -13,7 +13,10 @@
 //! The code is divided into different *modules*, each representing a typical **subsystem** of the
 //! <ommited for now>
 
+#![allow(incomplete_features)]
 #![feature(const_fn_fn_ptr_basics)]
+#![feature(const_generics)]
+#![feature(const_panic)]
 #![feature(format_args_nl)]
 #![feature(naked_functions)]
 #![feature(panic_info_message)]
@@ -38,9 +41,18 @@ mod time;
 /// # Safety
 ///
 /// - Only a single core must be active and running this function.
-/// - The init calls in this function must appear in the correct order.
+/// - The init calls in this function must appear in the correct order:
+///     - Virtual memory must be activated before the device drivers.
+///         - Without it, any tomic operations, e.g. the yet-to-be-introduced spinlocks
+///           in the device drivers (which currently employ NullLocks instead of spinlocks),
+///           will fail to work on the RPi SoCs.
 unsafe fn kernel_init() -> ! {
     use driver::interface::DriverManager;
+    use memory::mmu::interface::MMU;
+
+    if let Err(string) = memory::mmu::mmu().init() {
+        panic!("MMU: {}", string);
+    }
 
     for i in bsp::driver::driver_manager().all_device_drivers().iter() {
         if let Err(x) = i.init() {
@@ -62,6 +74,9 @@ fn kernel_main() -> ! {
     use time::interface::TimeManager;
 
     info!("Booting on: {}", bsp::board_name());
+
+    info!("MMU online. Special regions:");
+    bsp::memory::mmu::virt_mem_layout().print_layout();
 
     let (_, privilege_level) = exception::current_privilege_level();
     info!("Current privilgege level: {}", privilege_level);
@@ -86,6 +101,13 @@ fn kernel_main() -> ! {
     // Test a failing timer case.
     info!("Timer test, spinning for 1 second");
     time::time_manager().spin_for(Duration::from_secs(1));
+
+    let remapped_uart = unsafe { bsp::device_driver::PL011Uart::new(0x1FFF_1000) };
+    writeln!(
+        remapped_uart,
+        "[      !!!     ] Writing through the remapped UART at 0x1FFF_1000"
+    )
+    .unwrap();
 
     info!("Echoing input now");
     loop {
