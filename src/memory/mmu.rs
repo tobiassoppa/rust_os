@@ -43,6 +43,7 @@ pub mod interface {
 
 /// Architecture agnostic translation types.
 #[allow(missing_docs)]
+#[allow(dead_code)]
 #[derive(Copy, Clone)]
 pub enum Translation {
     Identity,

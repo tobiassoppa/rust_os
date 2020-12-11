@@ -18,6 +18,7 @@
 #![feature(const_generics)]
 #![feature(const_panic)]
 #![feature(format_args_nl)]
+#![feature(global_asm)]
 #![feature(naked_functions)]
 #![feature(panic_info_message)]
 #![feature(trait_alias)]
@@ -49,6 +50,8 @@ mod time;
 unsafe fn kernel_init() -> ! {
     use driver::interface::DriverManager;
     use memory::mmu::interface::MMU;
+
+    exception::handling_init();
 
     if let Err(string) = memory::mmu::mmu().init() {
         panic!("MMU: {}", string);
@@ -102,13 +105,28 @@ fn kernel_main() -> ! {
     info!("Timer test, spinning for 1 second");
     time::time_manager().spin_for(Duration::from_secs(1));
 
-    let remapped_uart = unsafe { bsp::device_driver::PL011Uart::new(0x1FFF_1000) };
-    writeln!(
-        remapped_uart,
-        "[      !!!     ] Writing through the remapped UART at 0x1FFF_1000"
-    )
-    .unwrap();
+    // Cause an exception by accessing a virtual address for which no translation was set up.
+    // This code accesses the address 8 GiB, which is outside the mapped address space.
+    //
+    // For demo purposes, the exception handler will catch the faulting 8 GiB address and allow
+    // Execution to continue.
+    info!("");
+    info!("Trying to write to address 8 GiB...");
+    let big_addr: u64 = 8 * 1024 * 1024 * 1024;
+    unsafe { core::ptr::read_volatile(big_addr as *mut u64) };
 
+    info!("************************************************");
+    info!("Whoa! We recovered from a synchronous exception!");
+    info!("************************************************");
+    info!("");
+    // info!("Let's try again");
+
+    // // Now use address 9 GiB. The exception handler won't forgive us this time.
+    // info!("Trying to write to address 9 GiB...");
+    // let big_addr: u64 = 9 * 1024 * 1024 * 1024;
+    // unsafe { core::ptr::read_volatile(big_addr as *mut u64) };
+
+    // This will never be reached!
     info!("Echoing input now");
     loop {
         let c = bsp::console::console().read_char();
